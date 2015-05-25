@@ -2,12 +2,14 @@ var React = require('react');
 var GoogleMaps = require('react-googlemaps');
 var GoogleMapsApi = window.google.maps;
 var geocoder = new GoogleMapsApi.Geocoder();
-
+var Map = GoogleMaps.Map;
+var Marker = GoogleMaps.Marker;
 
 var App = React.createClass({
   getInitialState() {
     return {
-      value: ''
+      value: '',
+      locations: []
     }
   },
   componentDidMount() {
@@ -34,7 +36,9 @@ var App = React.createClass({
     geocoder.geocode({ 'address': input }, function(results, status) {
       if (status == GoogleMapsApi.GeocoderStatus.OK) {
         var geocode = results[0].geometry.location;
-        console.log(geocode)
+        this.setState({
+          locations: [{lat: geocode.A, lng: geocode.F}]
+        });
       }
       else {
         console.log("Something went wrong: " + status);
@@ -47,10 +51,25 @@ var App = React.createClass({
     });
   },
   render() {
+    var locations = this.state.locations;
+    var center = locations.length > 0 ?
+        locations[0] : {lat: 0, lng: 0};
+    var markers = locations.map(function(l) {
+      return <Marker position={new GoogleMapsApi.LatLng(l.lat, l.lng)} />
+    });
+    
     return (
       <div>
-        <h1>Hello world</h1>
         <input id="autocompleteInput" ref="autocomplete" value={this.state.value} onChange={this.handleChange} type="text"/>
+        <Map
+          initialZoom={3}
+          initialCenter={new GoogleMapsApi.LatLng(center.lat, center.lng)}
+          width={700}
+          height={700}>
+
+          {markers}
+
+        </Map>
       </div>
       )
   }
