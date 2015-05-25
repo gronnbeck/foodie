@@ -8,7 +8,8 @@ var browserify = require('browserify');
 var reactify = require("reactify");
 var template = require('gulp-template');
 
-var isProduction = process.env.NODE_ENV === 'production' || false;
+// var isProduction = process.env.NODE_ENV === 'production' || false;
+var isProduction = false;
 
 var path = {
 	scriptsPath: './js/**/*.js',
