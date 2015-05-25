@@ -4,5 +4,5 @@ var app = express();
 app.use('/', express.static('public'));
 
 app.listen(process.env.PORT, function() {
-  console.log('Oh lala: ' + process.env.PORT);
+  console.log('Oh lala! ' + process.env.PORT);
 });
