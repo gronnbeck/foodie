@@ -50,6 +50,16 @@ var App = React.createClass({
       value: event.target.value
     });
   },
+  handleChangeName(event) {
+    this.setState({
+      placeName: event.target.value
+    });
+  },
+  submit(event) {
+    event.preventDefault();
+    console.log('Does not submit');
+    console.log(this.state);
+  },
   render() {
     var locations = this.state.locations;
     var center = locations.length > 0 ?
@@ -57,9 +67,10 @@ var App = React.createClass({
     var markers = locations.map(function(l) {
       return <Marker position={new GoogleMapsApi.LatLng(l.lat, l.lng)} />
     });
-    
+
     return (
       <div>
+        <input id="placeName" value={this.state.placeName} onChange={this.handleChangeName} type="text" />
         <input id="autocompleteInput" ref="autocomplete" value={this.state.value} onChange={this.handleChange} type="text"/>
         <Map
           initialZoom={3}
@@ -70,6 +81,7 @@ var App = React.createClass({
           {markers}
 
         </Map>
+        <button onClick={this.submit}>Submit</button>
       </div>
       )
   }
