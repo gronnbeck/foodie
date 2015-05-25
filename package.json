@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "gulp",
-    "postinstall": "npm run gulp"
+    "postinstall": "npm run build"
   },
   "author": "Ken Grønnbeck",
   "license": "ISC",
