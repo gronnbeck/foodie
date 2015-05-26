@@ -1,9 +1,11 @@
+var request = require('superagent');
 var React = require('react');
 var GoogleMaps = require('react-googlemaps');
 var GoogleMapsApi = window.google.maps;
 var geocoder = new GoogleMapsApi.Geocoder();
 var Map = GoogleMaps.Map;
 var Marker = GoogleMaps.Marker;
+
 
 var App = React.createClass({
   getInitialState() {
@@ -57,8 +59,27 @@ var App = React.createClass({
   },
   submit(event) {
     event.preventDefault();
-    console.log('Does not submit');
-    console.log(this.state);
+    this.setState({
+      posting: true
+    });
+    request
+      .post('/api/locations')
+      .set('content-type', 'application/json')
+      .send({
+        name: this.state.placeName,
+        address: this.state.value,
+        lat: this.state.locations[0].lat,
+        lng: this.state.locations[0].lng
+      })
+      .end(function(err, result) {
+        var success = null;
+        if (err) success = false
+        else success = true;
+        this.setState({
+          success: success,
+          posting: false
+        })
+      }.bind(this));
   },
   render() {
     var locations = this.state.locations;
