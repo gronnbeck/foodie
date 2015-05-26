@@ -93,6 +93,7 @@ var App = React.createClass({
       <div>
         <input id="placeName" value={this.state.placeName} onChange={this.handleChangeName} type="text" />
         <input id="autocompleteInput" ref="autocomplete" value={this.state.value} onChange={this.handleChange} type="text"/>
+        <button onClick={this.submit}>Submit</button>
         <Map
           initialZoom={3}
           initialCenter={new GoogleMapsApi.LatLng(center.lat, center.lng)}
@@ -102,7 +103,6 @@ var App = React.createClass({
           {markers}
 
         </Map>
-        <button onClick={this.submit}>Submit</button>
       </div>
       )
   }
