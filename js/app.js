@@ -1,5 +1,9 @@
 var request = require('superagent');
 var React = require('react');
+var Router = require('react-router');
+var DefaultRoute = Router.DefaultRoute;
+var Route = Router.Route;
+var RouteHandler = Router.RouteHandler;
 var GoogleMaps = require('react-googlemaps');
 var GoogleMapsApi = window.google.maps;
 var geocoder = new GoogleMapsApi.Geocoder();
@@ -7,7 +11,29 @@ var Map = GoogleMaps.Map;
 var Marker = GoogleMaps.Marker;
 
 
-var App = React.createClass({
+var LocationsMap = React.createClass({
+  render(){
+    var locations = this.props.locations;
+    var center = locations.length > 0 ?
+        locations[0] : {lat: 0, lng: 0};
+    var markers = locations.map(function(l) {
+      return <Marker position={new GoogleMapsApi.LatLng(l.lat, l.lng)} />
+    });
+    return (
+    <Map
+      initialZoom={3}
+      initialCenter={new GoogleMapsApi.LatLng(center.lat, center.lng)}
+      width={700}
+      height={700}>
+
+      {markers}
+
+    </Map>
+    )
+  }
+});
+
+var Add = React.createClass({
   getInitialState() {
     return {
       value: '',
@@ -82,31 +108,61 @@ var App = React.createClass({
       }.bind(this));
   },
   render() {
-    var locations = this.state.locations;
-    var center = locations.length > 0 ?
-        locations[0] : {lat: 0, lng: 0};
-    var markers = locations.map(function(l) {
-      return <Marker position={new GoogleMapsApi.LatLng(l.lat, l.lng)} />
-    });
-
     return (
       <div>
         <input id="placeName" value={this.state.placeName} onChange={this.handleChangeName} type="text" />
         <input id="autocompleteInput" ref="autocomplete" value={this.state.value} onChange={this.handleChange} type="text"/>
         <button onClick={this.submit}>Submit</button>
-        <Map
-          initialZoom={3}
-          initialCenter={new GoogleMapsApi.LatLng(center.lat, center.lng)}
-          width={700}
-          height={700}>
-
-          {markers}
-
-        </Map>
+        <LocationsMap locations={this.state.locations}/>
       </div>
       )
   }
 });
 
+var List = React.createClass({
+  getInitialState() {
+    return {
+      locations: []
+    }
+  },
+  componentDidMount() {
+    request
+    .get('/api/locations')
+    .end(function(err, result) {
+      if (err) return alert('something went wrong errorCode 5001')
+      var locations = JSON.parse(result.text);
+      this.setState({
+        locations: locations
+      });
+    }.bind(this))
+  },
+  locations() {
+    return this.state.locations
+  },
+  render() {
+    return (
+      <LocationsMap locations={this.locations()}/>
+    );
+  }
+});
 
-React.render(<App/>, document.getElementById('app'));
+var App = React.createClass({
+  render () {
+    return (
+      <div>
+        <RouteHandler/>
+      </div>
+    )
+  }
+});
+
+var routes = (
+  <Route handler={App}>
+    <Route path="/add" handler={Add}/>
+    <DefaultRoute handler={List}/>
+  </Route>
+);
+
+Router.run(routes, Router.HashLocation, function(Root) {
+  React.render(<Root/>, document.getElementById('app'));
+});
